@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import torch
 import torch.nn as nn
 from safetensors.torch import load_model
 
@@ -25,7 +26,7 @@ class GRUModel(nn.Module):
             bidirectional=bidirectional,
         )
         self.classifier = nn.Linear(self.hidden_dim, num_labels)
-        # self.loss_fn = nn.BCEWithLogitsLoss(weight=class_weights)
+        self.loss_fn = nn.BCEWithLogitsLoss(torch.ones(6))
 
     def forward(self, input_ids, labels=None):
         emb = self.embeddings(input_ids)

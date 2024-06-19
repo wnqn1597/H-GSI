@@ -106,7 +106,7 @@ class MetricsComputer:
         self.stride = stride // 6
         self.long_index = long_index
         self.long_group_index = long_group_index
-        print("long:", len(long_group_index))
+        # print("long:", len(long_group_index))
         self.file_name = f"inference_result_{int(time.time())}.txt"
         self.rank = rank
 

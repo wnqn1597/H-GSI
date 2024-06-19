@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import argparse
 import os
 import tqdm.auto as tqdm
 import random
@@ -15,6 +16,10 @@ from sklearn.metrics import (
     recall_score,
 )
 
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--split", type=str, default="test")
+args = parser.parse_args()
 
 def set_seed(seed):
     os.environ["PYTHONHASHSEED"] = str(seed)
@@ -121,7 +126,7 @@ def get_dataloader(valid_batch):
     valid_labs = []
 
     for data in tqdm.tqdm(
-        dataset["test"], disable=not accelerator.is_local_main_process
+        dataset[args.split], disable=not accelerator.is_local_main_process
     ):
         text_no_dash = data["seq"].replace("-", "")
         label_no_dash = data["label"].replace("0-", "1")

@@ -24,6 +24,7 @@ from transformer import get_transformer
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model", type=str, default="gru")
+parser.add_argument("--split", type=str, default="test")
 args = parser.parse_args()
 
 datasets.disable_caching()
@@ -126,6 +127,10 @@ long_group_index = []
 long_index = []
 
 model_name = args.model
+split = args.split
+assert model_name in ["gru", "lstm", "fcn", "tcn", "transformer"]
+assert split in ["train", "test"]
+
 model = None
 if model_name == "gru":
     model = get_gru()
@@ -145,13 +150,15 @@ print("load model")
 dataset = datasets.load_from_disk("./human")
 dataset = dataset.train_test_split(test_size=0.1, shuffle=True, seed=42)
 
-valid_dataset = dataset["test"].map(func, batched=True, remove_columns=["seq"])
+valid_dataset = dataset[split].map(func, batched=True, remove_columns=["seq"])
 valid_dataset = valid_dataset.rename_column("label", "labels")
 print("load datasets")
 
+eval_batch = 128 if model_name != "transformer" else 32
+
 training_args = TrainingArguments(
     output_dir="ckpt",
-    per_device_eval_batch_size=128,
+    per_device_eval_batch_size=eval_batch,
     report_to=None,
     ddp_find_unused_parameters=(model_name == "transformer") if ddp else None,
     disable_tqdm=True,
